@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-
+from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import LabelEncoder
 
 
@@ -13,35 +13,38 @@ class DataLoader(object):
                    'Fence', 'FireplaceQu', 'Utilities']
         self.dataset.drop(dropped, axis=1, inplace=True)
 
+        # Numerical features
         self.dataset['LotFrontage'].fillna(
             value=self.dataset['LotFrontage'].median(), inplace=True)
-        self.dataset['MasVnrType'].fillna(value='None', inplace=True)
-        self.dataset['MasVnrArea'].fillna(0, inplace=True)
-        self.dataset['BsmtCond'].fillna(value='TA', inplace=True)
-        self.dataset['BsmtExposure'].fillna(value='No', inplace=True)
-        self.dataset['Electrical'].fillna(value='SBrkr', inplace=True)
-        self.dataset['BsmtFinType2'].fillna(value='Unf', inplace=True)
-        self.dataset['GarageType'].fillna(value='Attchd', inplace=True)
-        self.dataset['GarageYrBlt'].fillna(
-            value=self.dataset['GarageYrBlt'].median(), inplace=True)
-        self.dataset['GarageFinish'].fillna(value='Unf', inplace=True)
-        self.dataset['GarageQual'].fillna(value='TA', inplace=True)
-        self.dataset['GarageCond'].fillna(value='TA', inplace=True)
-        self.dataset['BsmtFinType1'].fillna(value='NO', inplace=True)
-        self.dataset['BsmtQual'].fillna(value='No', inplace=True)
+        self.dataset['MasVnrArea'].fillna(value=self.dataset['MasVnrArea'].median(), inplace=True)
         self.dataset['BsmtFullBath'].fillna(
             value=self.dataset['BsmtFullBath'].median(), inplace=True)
+        self.dataset['GarageYrBlt'].fillna(
+            value=self.dataset['GarageYrBlt'].median(), inplace=True)
         self.dataset['BsmtFinSF1'].fillna(
             value=self.dataset['BsmtFinSF1'].median(), inplace=True)
-        self.dataset['BsmtFinSF2'].fillna(value=0, inplace=True)
-        self.dataset['BsmtUnfSF'].fillna(value=0, inplace=True)
+        self.dataset['BsmtFinSF2'].fillna(value=self.dataset['BsmtFinSF2'].median(), inplace=True)
+        self.dataset['BsmtUnfSF'].fillna(value=self.dataset['BsmtUnfSF'].median(), inplace=True)
         self.dataset['TotalBsmtSF'].fillna(
             value=self.dataset['TotalBsmtSF'].median(), inplace=True)
-        self.dataset['BsmtHalfBath'].fillna(value=0, inplace=True)
+        self.dataset['BsmtHalfBath'].fillna(value=self.dataset['BsmtHalfBath'].median(), inplace=True)
         self.dataset['GarageCars'].fillna(
             value=self.dataset['GarageCars'].median(), inplace=True)
         self.dataset['GarageArea'].fillna(
             value=self.dataset['GarageArea'].median(), inplace=True)
+
+        # Categorical features
+        self.dataset['MasVnrType'].fillna(value=self.dataset['MasVnrType'].mode(), inplace=True)
+        self.dataset['BsmtCond'].fillna(value=self.dataset['BsmtCond'].mode(), inplace=True)
+        self.dataset['BsmtExposure'].fillna(value=self.dataset['BsmtExposure'].mode(), inplace=True)
+        self.dataset['Electrical'].fillna(value=self.dataset['Electrical'].mode(), inplace=True)
+        self.dataset['BsmtFinType2'].fillna(value=self.dataset['BsmtFinType2'].mode(), inplace=True)
+        self.dataset['GarageType'].fillna(value=self.dataset['GarageType'].mode(), inplace=True)
+        self.dataset['GarageFinish'].fillna(value=self.dataset['GarageFinish'].mode(), inplace=True)
+        self.dataset['GarageQual'].fillna(value=self.dataset['GarageQual'].mode(), inplace=True)
+        self.dataset['GarageCond'].fillna(value=self.dataset['GarageCond'].mode(), inplace=True)
+        self.dataset['BsmtFinType1'].fillna(value=self.dataset['BsmtFinType1'].mode(), inplace=True)
+        self.dataset['BsmtQual'].fillna(value=self.dataset['BsmtQual'].mode(), inplace=True)
 
         le = LabelEncoder()
         self.dataset['MSZoning'] = le.fit_transform(self.dataset['MSZoning'])
@@ -104,4 +107,7 @@ class DataLoader(object):
             self.dataset['PavedDrive'])
         self.dataset['SaleCondition'] = le.fit_transform(
             self.dataset['SaleCondition'])
+
+        scaler = StandardScaler()
+        self.dataset = pd.DataFrame(scaler.fit_transform(self.dataset))
         return self.dataset
